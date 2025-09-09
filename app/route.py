@@ -85,6 +85,5 @@ def route_run():
                 'error': str(e),
                 'query': sql_query_encoded
             }), 500
-        
     return app
     
