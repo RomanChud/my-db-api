@@ -85,5 +85,3 @@ def execute_sql():
             'query': sql_query_encoded
         }), 500
 
-def route_run(environ, start_response):
-    return app(environ, start_response)
