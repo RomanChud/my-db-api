@@ -2,14 +2,17 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
+# Установка драйверов ODBC для SQL Server
 RUN apt-get update && apt-get install -y \
     curl \
-    && curl -O https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8f28-dafb585edee3/msodbcsql18_18.3.2.1-1_amd64.deb \
-    && apt-get install -y ./msodbcsql18_18.3.2.1-1_amd64.deb \
+    gnupg \
+    && curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft.gpg \
+    && echo "deb [signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/debian/11/prod bullseye main" > /etc/apt/sources.list.d/mssql-release.list \
+    && apt-get update \
+    && ACCEPT_EULA=Y apt-get install -y msodbcsql18 \
     && apt-get install -y unixodbc-dev \
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && rm msodbcsql18_18.3.2.1-1_amd64.deb
+    && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
