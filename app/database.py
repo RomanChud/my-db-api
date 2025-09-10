@@ -33,7 +33,6 @@ class dbConnector():
             test_conn.close()
             print("Connection test successful")  # Логирование
         except Exception as e:
-            print(f"Connection failed: {str(e)}")  # Логирование ошибки
             raise Exception(f"Invalid database credentials: {str(e)}")
         return api_key, expires_at
     
