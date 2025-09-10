@@ -84,16 +84,20 @@ class dbConnector():
                 row_dict = {}
                 for i, column in enumerate(columns):
                     value = row[i]
+                    if isinstance(value, str):
+                        try:
+                            value = value.encode('cp1251').decode('utf-8')
+                        except:
+                            pass  
                     if value is None:
                         row_dict[column] = None
                     elif hasattr(value, 'isoformat'):  
                         row_dict[column] = value.isoformat()
-                    elif isinstance(value, (bytes, bytearray)):  
-                        row_dict[column] = value.hex()  
+                    elif isinstance(value, (bytes, bytearray)): 
+                        row_dict[column] = value.hex()
                     else:
                         row_dict[column] = value
                 result.append(row_dict)
-                
             cursor.close()
             self._connection.close()
         return result
