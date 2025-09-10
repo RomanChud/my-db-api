@@ -17,8 +17,14 @@ def index():
         }
     })
 
-@app.route('/auth', methods=['POST'])
+@app.route('/auth', methods=['POST', 'OPTIONS'])
 def authenticate():
+    if request.method == 'OPTIONS':
+        response = jsonify()
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+        response.headers.add('Access-Control-Allow-Methods', 'POST')
+        return response, 200
     try:
         data = request.get_json()
         if not data or 'user' not in data or 'password' not in data:
