@@ -12,7 +12,7 @@ class dbConnector():
         self._active_connections = {}
 
     def _connect(self, user, password) -> None:
-        conn_str = f'DRIVER={{SQL Server}};SERVER={self._server};DATABASE={self._db_name};UID={user};PWD={password};TrustServerCertificate=yes'
+        conn_str = f'DRIVER={{ODBC Driver 18}};SERVER={self._server};DATABASE={self._db_name};UID={user};PWD={password};TrustServerCertificate=yes'
         try:
             self._connection = pyodbc.connect(conn_str)
             self._connection.setdecoding(pyodbc.SQL_CHAR, encoding='cp1251')
@@ -27,7 +27,7 @@ class dbConnector():
     def create_api_key(self, user, password, expires_hours=24):
         try:
             test_conn = pyodbc.connect(
-                f'DRIVER={{SQL Server}};SERVER={self._server};DATABASE={self._db_name};UID={user};PWD={password};TrustServerCertificate=yes'
+                f'DRIVER={{ODBC Driver 18}};SERVER={self._server};DATABASE={self._db_name};UID={user};PWD={password};TrustServerCertificate=yes'
             )
             test_conn.close()
         except Exception as e:
@@ -81,8 +81,19 @@ class dbConnector():
             columns = [column[0] for column in cursor.description]
             rows = cursor.fetchall()
             for row in rows:
-                result.append(dict(zip(columns, row)))
+                row_dict = {}
+                for i, column in enumerate(columns):
+                    value = row[i]
+                    if value is None:
+                        row_dict[column] = None
+                    elif hasattr(value, 'isoformat'):  
+                        row_dict[column] = value.isoformat()
+                    elif isinstance(value, (bytes, bytearray)):  
+                        row_dict[column] = value.hex()  
+                    else:
+                        row_dict[column] = value
+                result.append(row_dict)
+                
             cursor.close()
             self._connection.close()
         return result
-    
