@@ -17,8 +17,15 @@ def index():
         }
     })
 
-@app.route('/auth', methods=['POST'])
+@app.route('/auth', methods=['POST', 'OPTIONS'])
 def authenticate():
+    if request.method == 'OPTIONS':
+        response = jsonify()
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+        response.headers.add('Access-Control-Allow-Methods', 'POST, OPTIONS')
+        return response
+    
     try:
         data = request.get_json()
         if not data or 'user' not in data or 'password' not in data:
@@ -27,7 +34,7 @@ def authenticate():
                 'error': 'Необходимы параметры user и password'
             }), 400
         
-        print(f"Attempting auth for user: {data['user']}")  # Логирование
+        print(f"Attempting auth for user: {data['user']}")
         
         api_key, expires_at = app.db_connector.create_api_key(
             data['user'], 
@@ -35,20 +42,24 @@ def authenticate():
             expires_hours=24
         )
         
-        print(f"Auth successful for user: {data['user']}")  # Логирование
+        print(f"Auth successful for user: {data['user']}")
         
-        return jsonify({
+        response = jsonify({
             'success': True,
             'api_key': api_key,
             'expires_at': expires_at.isoformat()
         })
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
         
     except Exception as e:
-        print(f"Auth failed: {str(e)}")  # Детальное логирование ошибки
-        return jsonify({
+        print(f"Auth failed: {str(e)}")
+        response = jsonify({
             'success': False,
             'error': str(e),
-        }), 401
+        })
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response, 401
 @app.route('/query')
 def execute_sql():
     sql_query_encoded = request.args.get('sql')
