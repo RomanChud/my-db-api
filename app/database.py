@@ -12,7 +12,7 @@ class dbConnector():
         self._active_connections = {}
 
     def _connect(self, user, password) -> None:
-        conn_str = f'DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={self._server};DATABASE={self._db_name};UID={user};PWD={password}'
+        conn_str = f'DRIVER={{ODBC Driver 18 for SQL Server}};SERVER={self._server};DATABASE={self._db_name};UID={user};PWD={password};TrustServerCertificate=yes'
         try:
             self._connection = pyodbc.connect(conn_str)
             self._connection.setdecoding(pyodbc.SQL_CHAR, encoding='cp1251')
@@ -27,7 +27,7 @@ class dbConnector():
     def create_api_key(self, user, password, expires_hours=24):
         try:
             test_conn = pyodbc.connect(
-                f'DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={self._server};DATABASE={self._db_name};UID={user};PWD={password}'
+                f'DRIVER={{ODBC Driver 18 for SQL Server}};SERVER={self._server};DATABASE={self._db_name};UID={user};PWD={password};TrustServerCertificate=yes'
             )
             test_conn.close()
         except Exception as e:
