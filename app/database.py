@@ -12,7 +12,7 @@ class dbConnector():
         self._active_connections = {}
 
     def _connect(self, user, password) -> None:
-        conn_str = f'DRIVER={{SQL Server}};SERVER={self._server};DATABASE={self._db_name};UID={user};PWD={password}'
+        conn_str = f'DRIVER={{ODBC Driver 18 for SQL Server}};SERVER={self._server};DATABASE={self._db_name};UID={user};PWD={password}'
         try:
             self._connection = pyodbc.connect(conn_str)
             self._connection.setdecoding(pyodbc.SQL_CHAR, encoding='cp1251')
