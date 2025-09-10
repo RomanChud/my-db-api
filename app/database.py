@@ -25,20 +25,16 @@ class dbConnector():
             raise Exception(f"Database connection failed: {str(ex)}")
         
     def create_api_key(self, user, password, expires_hours=24):
-        try:
+       try:
+            print(f"Testing connection for user: {user}")  # Логирование
             test_conn = pyodbc.connect(
                 f'DRIVER={{SQL Server}};SERVER={self._server};DATABASE={self._db_name};UID={user};PWD={password}'
             )
             test_conn.close()
-        except:
-            raise Exception("Invalid database credentials")
-        api_key = secrets.token_urlsafe(32)
-        expires_at = datetime.now() + timedelta(hours=expires_hours)
-        self._active_connections[api_key] = {
-            'user': user,
-            'password': password,
-            'expires_at': expires_at
-        }
+            print("Connection test successful")  # Логирование
+        except Exception as e:
+            print(f"Connection failed: {str(e)}")  # Логирование ошибки
+            raise Exception(f"Invalid database credentials: {str(e)}")
         return api_key, expires_at
     
     def validate_api_key(self, api_key):
